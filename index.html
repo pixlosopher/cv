@@ -78,6 +78,9 @@
   .inbar input{flex:1;border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:14px;font-family:inherit;outline:none;color:var(--ink)}
   .inbar input:focus{border-color:var(--accent)}
   .inbar button{border:0;background:var(--accent);color:#fff;border-radius:8px;padding:0 16px;font-size:14px;cursor:pointer}
+  .enablebtn{border:1px solid var(--accent);background:#eef2f9;color:var(--accent);border-radius:8px;padding:9px 16px;font-size:14px;font-weight:500;cursor:pointer}
+  .enablebtn:hover{background:var(--accent);color:#fff}
+  .enablebtn:disabled{opacity:.6;cursor:default}
   /* footer */
   .foot{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
   .foot .lang{font-size:13px}
@@ -109,10 +112,18 @@
   <section><h2>Relevant Certifications</h2><div class="clist"><div>Google — AI (2026)</div><div>Google — AI for Data Analysis (2026)</div><div>Google — AI for Content Creation (2026)</div></div></section>
 
   <section><div class="chat">
-    <div class="ch"><div class="ct">Ask my CV</div><div class="cb">Chat with an assistant about my work</div></div>
-    <div class="stream" id="stream"><div class="msg bot">Hi — ask me anything about Pedro's experience, projects or availability.</div></div>
-    <div class="suggest" id="suggest"></div>
-    <div class="inbar"><input id="q" placeholder="Type a question…" autocomplete="off"><button id="send">Send</button></div>
+    <div class="ch"><div class="ct">Ask my CV</div><div class="cb">A small AI model that runs in your browser</div></div>
+    <div id="gate">
+      <p style="font-size:13.5px;color:var(--muted);margin-bottom:12px">This chat runs a small AI model 100% inside your browser — private, nothing leaves your device. The model (about 400 MB) downloads once, only when you start it.</p>
+      <button id="enable" class="enablebtn">Enable AI chat</button>
+      <div id="dlnote" style="font-size:12px;color:var(--faint);margin-top:10px"></div>
+    </div>
+    <div id="chatui" style="display:none">
+      <div class="stream" id="stream"><div class="msg bot">Ask me anything about Pedro's experience, projects or availability.</div></div>
+      <div class="suggest" id="suggest"></div>
+      <div class="inbar"><input id="q" placeholder="Type a question…" autocomplete="off"><button id="send">Send</button></div>
+      <div style="font-size:11px;color:var(--faint);margin-top:9px">Runs locally in your browser via WebLLM · no servers, no tracking.</div>
+    </div>
   </div></section>
 
   <div class="foot">
@@ -120,26 +131,45 @@
     <div class="qr"><img src="data:image/png;base64,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" alt="QR"><div class="l"><b>Meridian</b>meridianworld.app</div></div>
   </div>
 </div>
-<script>
-const ENDPOINT="";  /* set to your Claude Worker URL to enable live chat */
+<script type="module">
 const CONTEXT="You are the CV assistant for Pedro Hernandez Baez, a Generative AI Consultant and Prompt Engineer (5+ years) based in Guadalajara, Mexico, open to remote work worldwide and to relocation/visa sponsorship (Canada and beyond). MA in Continental Philosophy, University of Essex (UK). Bilingual Spanish/English. Google certified in AI, AI for Data Analysis, AI for Content Creation. Projects he built: Meridian (meridianworld.app) - an AI cost-of-living & relocation product comparing 1,000+ cities with live AI-sourced prices and an AI advisor (Next.js); PhiLang (pixlosopher.github.io/philang) - a philosophical programming language with Claude API reasoning, neural embeddings (skip-gram, t-SNE) and D3.js graphs; Casa Orbe (casaorbe.ai) - AI-to-3D generative design printed in real life; Flesh and Code (fleshandcode.art) - generative-AI art exhibited in Rome and NYC. Skills: prompt engineering, generative AI, LLMs (ChatGPT, Claude), Claude API, AI content, AI-assisted data analysis, AI strategy. Contact: pedro.h.baez@gmail.com. Answer recruiters concisely and warmly in the user's language, only about Pedro's experience, projects, skills, availability and contact.";
 const SUGGEST=["What is Meridian?", "Open to relocation?", "What tools do you use?", "How to contact?"];
-const PENDING="The live AI chat (powered by Claude) is being connected. Meanwhile, reach Pedro at pedro.h.baez@gmail.com or explore the projects above.";
-const ERR="Sorry, I couldn't reach the AI service right now. Email pedro.h.baez@gmail.com.";
+const T={"loading": "Downloading model…", "starting": "Starting — downloading the model once…", "nogpu": "In-browser AI needs desktop Chrome or Edge (WebGPU). Meanwhile, email pedro.h.baez@gmail.com.", "err": "Couldn't load the model."};
+const MODEL="Qwen2.5-0.5B-Instruct-q4f16_1-MLC";
+const gate=document.getElementById('gate'),ui=document.getElementById('chatui'),dl=document.getElementById('dlnote');
 const stream=document.getElementById('stream'),sg=document.getElementById('suggest');
+let engine=null,loading=false;
 function add(t,w){const d=document.createElement('div');d.className='msg '+w;d.textContent=t;stream.appendChild(d);stream.scrollTop=stream.scrollHeight;}
 function typing(){const d=document.createElement('div');d.className='typing';d.textContent='\u2026';stream.appendChild(d);stream.scrollTop=stream.scrollHeight;return d;}
-async function ask(q){
-  if(!q||!q.trim())return; add(q,'me'); const t=typing();
-  if(!ENDPOINT){ setTimeout(()=>{t.remove();add(PENDING,'bot');},350); return; }
+async function load(){
+  if(engine) return engine;
+  if(!('gpu' in navigator)){ dl.textContent=T.nogpu; return null; }
+  if(loading) return null; loading=true;
   try{
-    const r=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,context:CONTEXT})});
-    const d=await r.json(); t.remove(); add((d&&(d.reply||d.text))||'\u2026','bot');
-  }catch(e){ t.remove(); add(ERR,'bot'); }
+    const webllm=await import("https://esm.run/@mlc-ai/web-llm");
+    engine=await webllm.CreateMLCEngine(MODEL,{initProgressCallback:(p)=>{dl.textContent=T.loading+' '+Math.round((p.progress||0)*100)+'%';}});
+    dl.textContent=''; return engine;
+  }catch(e){ dl.textContent=T.err+' '+e.message; loading=false; return null; }
+}
+async function ask(q){
+  if(!q||!q.trim())return; add(q,'me'); const ty=typing();
+  const eng=await load();
+  if(!eng){ ty.remove(); add(T.nogpu,'bot'); return; }
+  try{
+    const r=await eng.chat.completions.create({messages:[{role:'system',content:CONTEXT},{role:'user',content:q.slice(0,600)}],max_tokens:300,temperature:0.3});
+    ty.remove(); add((r&&r.choices&&r.choices[0]&&r.choices[0].message.content)||'\u2026','bot');
+  }catch(e){ ty.remove(); add(T.err+' '+e.message,'bot'); }
 }
 SUGGEST.forEach(q=>{const b=document.createElement('button');b.className='qbtn';b.textContent=q;b.onclick=()=>ask(q);sg.appendChild(b);});
 document.getElementById('send').onclick=()=>{const i=document.getElementById('q');ask(i.value);i.value='';};
 document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter'){ask(e.target.value);e.target.value='';}});
+document.getElementById('enable').onclick=async()=>{
+  const b=document.getElementById('enable');
+  if(!('gpu' in navigator)){ dl.textContent=T.nogpu; return; }
+  b.disabled=true; dl.textContent=T.starting;
+  const eng=await load();
+  if(eng){ gate.style.display='none'; ui.style.display='block'; } else { b.disabled=false; }
+};
 </script>
 </body>
 </html>
